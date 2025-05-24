@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kepler-Bouwkamp Constant Explorer</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        header p {
+            font-size: 0.9em;
+            color: #555;
+            max-width: 700px; /* Increased max-width for better readability of detailed text */
+            line-height: 1.6;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            width: 100%;
+            max-width: 1200px;
+        }
+        .visualization-area {
+            flex: 2;
+            min-width: 300px;
+            max-width: 600px;
+            aspect-ratio: 1 / 1;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        #keplerSvg {
+            width: 95%;
+            height: 95%;
+        }
+        .controls-area {
+            flex: 1;
+            min-width: 280px;
+            max-width: 400px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .control-group {
+            margin-bottom: 20px;
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #3498db;
+        }
+        .control-group input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+        .control-group span {
+            font-weight: normal;
+            color: #2c3e50;
+        }
+        .results {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #e9f5ff;
+            border-radius: 8px;
+            border-left: 5px solid #3498db;
+        }
+        .results p {
+            margin: 8px 0;
+            font-size: 0.95em;
+        }
+        .results strong {
+            color: #2980b9;
+        }
+        .commentator {
+            margin-top: 15px;
+            padding: 12px;
+            background-color: #fff3e0;
+            border-radius: 8px;
+            border-left: 5px solid #ffa726;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .commentator p {
+            margin: 0;
+            font-style: italic;
+            color: #e65100;
+            font-size: 0.9em;
+        }
+        .shape {
+            transition: opacity 0.7s ease-in-out, transform 0.7s ease-in-out;
+            transform-origin: center center;
+        }
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.8em;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Kepler-Bouwkamp Constant Explorer</h1>
+        <p>
+            Discover the fascinating Kepler-Bouwkamp constant! This constant arises from an infinite process of
+            inscribing <strong>regular</strong> polygons within circles, and then new circles within those polygons.
+            For the specific Kepler-Bouwkamp constant, this process starts with a <strong>regular triangle</strong> (3 sides) inscribed in a circle (e.g., of radius 1).
+            Then, a new circle is inscribed within this triangle. Next, a <strong>regular square</strong> (4 sides) is inscribed in this new circle,
+            followed by another inscribed circle, then a <strong>regular pentagon</strong> (5 sides), and so on, with the number of sides of the regular polygon increasing by one at each step.
+            The constant is the limiting radius of these successively inscribed circles: ∏<sub>k=3</sub><sup>∞</sup> cos(π/k) ≈ 0.1149420448.
+            <br><br>
+            Use the sliders to explore this geometric process. The "Starting Polygon Sides" slider sets the number of sides (k) for the <em>first</em> <strong>regular</strong> polygon in the sequence.
+            Subsequent <strong>regular</strong> polygons will then have k+1, k+2, ... sides.
+            The "Calculated Product" shows the result of ∏<sub>j=k</sub><sup>k+iterations-1</sup> cos(π/j) based on your selections.
+            The true Kepler-Bouwkamp value is shown for comparison when you start with 3 sides.
+        </p>
+    </header>
+
+    <div class="container">
+        <div class="visualization-area">
+            <svg id="keplerSvg" viewbox="0 0 400 400"></svg>
+        </div>
+        <div class="controls-area">
+            <h2>Controls & Results</h2>
+            <div class="control-group">
+                <label for="startNSlider">Starting Polygon Sides (k): <span id="startNValue">3</span></label>
+                <input type="range" id="startNSlider" min="3" max="10" value="3">
+            </div>
+            <div class="control-group">
+                <label for="iterationsSlider">Number of Iterations (Polygons): <span id="iterationsValue">5</span></label>
+                <input type="range" id="iterationsSlider" min="1" max="300" value="5">
+            </div>
+
+            <div class="results">
+                <p><strong>Calculated Product:</strong> <span id="calculatedConstant">N/A</span></p>
+                <p id="kbInfo" style="display:none;"><strong>Kepler-Bouwkamp Constant (approx.):</strong> 0.1149420448</p>
+            </div>
+
+            <div class="commentator">
+                <p id="funnyComment">Adjust the sliders to begin the cosmic construction!</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Explore the geometry! All polygons drawn are regular polygons.</p>
+    </footer>
+
+    <script src="index.js"></script>
+</body>
+</html>
